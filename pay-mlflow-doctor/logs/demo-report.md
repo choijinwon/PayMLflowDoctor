@@ -78,3 +78,48 @@
 - Message: Local paths are not portable across Kubernetes nodes.
 - Recommendation: Use object storage or PVC-backed paths approved for the serving cluster.
 - Auto fix: `requires_confirmation`
+
+### 9. Python version is not approved by policy
+
+- ID: `POLICY_PYTHON_VERSION_NOT_APPROVED`
+- Severity: `high`
+- File: `conda.yaml`
+- Message: conda.yaml uses Python 3.9, but approved versions are ['3.11'].
+- Recommendation: Align the serving runtime with the approved platform Python version.
+- Auto fix: `requires_confirmation`
+
+### 10. Python version is not approved by policy
+
+- ID: `POLICY_PYTHON_VERSION_NOT_APPROVED`
+- Severity: `high`
+- File: `MLmodel`
+- Message: MLmodel uses Python 3.9, but approved versions are ['3.11'].
+- Recommendation: Align the serving runtime with the approved platform Python version.
+- Auto fix: `requires_confirmation`
+
+### 11. Required policy environment key is missing
+
+- ID: `POLICY_REQUIRED_ENV_MISSING`
+- Severity: `high`
+- File: `.env.example`
+- Message: KakaoPay policy requires MODEL_URI to be declared in env or config files.
+- Recommendation: Declare the key with a placeholder value and keep real values in the approved secret manager.
+- Auto fix: `requires_confirmation`
+
+### 12. URI is blocked by deployment policy
+
+- ID: `POLICY_BLOCKED_URI_PREFIX`
+- Severity: `critical`
+- File: `config.yaml`
+- Message: model_uri uses 'file:C:\Users\pay\model', which matches a blocked local or non-portable URI prefix.
+- Recommendation: Use a registry or object-storage URI reachable from the serving cluster.
+- Auto fix: `requires_confirmation`
+
+### 13. URI is blocked by deployment policy
+
+- ID: `POLICY_BLOCKED_URI_PREFIX`
+- Severity: `critical`
+- File: `kserve.yaml`
+- Message: storageUri uses 'file:/models/fds-risk-model', which matches a blocked local or non-portable URI prefix.
+- Recommendation: Use a registry or object-storage URI reachable from the serving cluster.
+- Auto fix: `requires_confirmation`

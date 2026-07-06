@@ -1,0 +1,48 @@
+name: PayMLflow Doctor CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        working-directory: pay-mlflow-doctor
+        run: python -m pip install -e .
+
+      - name: Run unit tests
+        working-directory: pay-mlflow-doctor
+        run: python -m unittest discover -s tests -v
+
+      - name: Validate healthy sample with KakaoPay policy
+        working-directory: pay-mlflow-doctor
+        run: |
+          paymlflow-doctor validate sample-data/healthy-mlflow-project \
+            --policy policies/kakaopay-mlops-policy.yaml \
+            --fail-on high
+
+      - name: Verify broken sample is blocked
+        working-directory: pay-mlflow-doctor
+        run: |
+          set +e
+          paymlflow-doctor validate sample-data/broken-mlflow-project \
+            --policy policies/kakaopay-mlops-policy.yaml \
+            --fail-on high
+          code=$?
+          if [ "$code" -ne 2 ]; then
+            echo "Expected broken sample to fail with exit code 2, got $code"
+            exit 1
+          fi

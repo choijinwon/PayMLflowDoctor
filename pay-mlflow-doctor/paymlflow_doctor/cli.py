@@ -25,14 +25,16 @@ def main(argv: list[str] | None = None) -> int:
     validate.add_argument("--format", choices=["json", "markdown"], default="markdown")
     validate.add_argument("--output", help="Optional output file path.")
     validate.add_argument("--fail-on", choices=["critical", "high", "medium", "low"], default=None)
+    validate.add_argument("--policy", help="Optional enterprise policy YAML file.")
 
     fix = sub.add_parser("fix", help="Plan or apply safe configuration fixes.")
     fix.add_argument("project")
     fix.add_argument("--apply", action="store_true", help="Apply only low-risk fixes.")
+    fix.add_argument("--policy", help="Optional enterprise policy YAML file.")
 
     args = parser.parse_args(argv)
     if args.command == "validate":
-        report = validate_project(args.project)
+        report = validate_project(args.project, args.policy)
         content = to_json(report) if args.format == "json" else to_markdown(report)
         _write_or_print(content, args.output)
         if args.fail_on:
@@ -43,10 +45,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "fix":
         if args.apply:
-            for item in apply_safe_fixes(args.project):
+            for item in apply_safe_fixes(args.project, args.policy):
                 print(item)
             return 0
-        for item in plan_fixes(args.project):
+        for item in plan_fixes(args.project, args.policy):
             print(f"{item['risk']}: {item['action']} ({item['id']}) - {item['detail']}")
         return 0
     return 1

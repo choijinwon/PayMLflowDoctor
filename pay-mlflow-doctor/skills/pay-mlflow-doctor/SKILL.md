@@ -15,7 +15,7 @@ When invoked, act as a deployment copilot:
 2. Run the local validator:
 
 ```bash
-python -m paymlflow_doctor.cli validate <project-path> --format markdown
+python -m paymlflow_doctor.cli validate <project-path> --policy policies/kakaopay-mlops-policy.yaml --format markdown
 ```
 
 3. Summarize risk in business terms:
@@ -27,10 +27,14 @@ python -m paymlflow_doctor.cli validate <project-path> --format markdown
 5. Apply only low-risk automatic fixes when the user asks for fix mode:
 
 ```bash
-python -m paymlflow_doctor.cli fix <project-path> --apply
+python -m paymlflow_doctor.cli fix <project-path> --policy policies/kakaopay-mlops-policy.yaml --apply
 ```
 
 Do not invent a complex ML model. This plugin is intentionally a rule-engine based deployment safety copilot.
+
+## Enterprise Policy Pack
+
+When `policies/kakaopay-mlops-policy.yaml` exists, use it as the default policy file. Treat policy findings as release-governance findings, not just lint findings. Explain them in terms of reproducibility, auditability, and safe financial AI deployment.
 
 ## User Commands
 

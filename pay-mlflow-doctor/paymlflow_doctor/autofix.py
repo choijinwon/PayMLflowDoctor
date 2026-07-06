@@ -11,11 +11,15 @@ MODEL_URI=models:/your-model/Staging
 """
 
 
-def plan_fixes(root: str | Path) -> list[dict[str, str]]:
-    report = validate_project(root)
+def plan_fixes(root: str | Path, policy_path: str | Path | None = None) -> list[dict[str, str]]:
+    report = validate_project(root, policy_path)
     planned: list[dict[str, str]] = []
+    planned_actions: set[str] = set()
     for finding in report.findings:
         if finding.autofix == "create_env_example":
+            if "create .env.example" in planned_actions:
+                continue
+            planned_actions.add("create .env.example")
             planned.append({
                 "id": finding.id,
                 "action": "create .env.example",
@@ -39,10 +43,10 @@ def plan_fixes(root: str | Path) -> list[dict[str, str]]:
     return planned
 
 
-def apply_safe_fixes(root: str | Path) -> list[str]:
+def apply_safe_fixes(root: str | Path, policy_path: str | Path | None = None) -> list[str]:
     project_root = Path(root).expanduser().resolve()
     applied: list[str] = []
-    report = validate_project(project_root)
+    report = validate_project(project_root, policy_path)
     finding_ids = {finding.id for finding in report.findings}
     env_path = project_root / ".env.example"
     if "TRACKING_URI_MISSING" in finding_ids and not env_path.exists():

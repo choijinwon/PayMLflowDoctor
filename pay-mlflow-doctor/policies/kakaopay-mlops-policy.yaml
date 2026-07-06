@@ -1,0 +1,28 @@
+# KakaoPay-style MLOps release policy for the hackathon demo.
+# This file intentionally contains no secrets or real internal endpoints.
+
+required_files:
+  - MLmodel
+  - requirements.txt
+  - Dockerfile
+  - kserve.yaml
+
+approved_python_versions:
+  - "3.11"
+
+required_env_keys:
+  - MLFLOW_TRACKING_URI
+  - MODEL_URI
+
+allowed_remote_uri_prefixes:
+  - models:/
+  - runs:/
+  - s3://
+  - gs://
+  - https://
+
+blocked_uri_prefixes:
+  - file:
+  - /
+  - C:
+  - D:

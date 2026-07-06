@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 from .models import Finding, SEVERITY_SCORE, ScanContext, ScanReport
+from .policy import Policy, load_policy
 from .scanner import scan_project
 
 
@@ -222,14 +223,87 @@ def _validate_docker_and_kserve(context: ScanContext, findings: list[Finding]) -
                 ))
 
 
-def validate_project(root: str | Path) -> ScanReport:
+def _extract_uri_values(context: ScanContext) -> list[tuple[str, str, str]]:
+    values: list[tuple[str, str, str]] = []
+    for rel, text in context.text.items():
+        for key in ("model_uri", "MODEL_URI", "storageUri", "storageURI"):
+            pattern = rf"{re.escape(key)}\s*[:=]\s*['\"]?([^\n'\" ]+)"
+            for match in re.finditer(pattern, text):
+                values.append((rel, key, match.group(1).strip()))
+    return values
+
+
+def _validate_policy(context: ScanContext, findings: list[Finding], policy: Policy) -> None:
+    if not policy:
+        return
+
+    present_names = {Path(rel).name for rel in context.files}
+    for required_file in policy.get("required_files", []):
+        if required_file not in present_names:
+            findings.append(Finding(
+                "POLICY_REQUIRED_FILE_MISSING",
+                "Required policy file is missing",
+                "high",
+                required_file,
+                f"KakaoPay policy requires {required_file}, but it was not found.",
+                "Add the required file or document the approved managed-runtime exception.",
+                "requires_confirmation",
+            ))
+
+    approved_python = set(policy.get("approved_python_versions", []))
+    if approved_python:
+        for rel, version in _python_versions(context).items():
+            normalized = re.search(r"[0-9]+(?:\.[0-9]+)?", version)
+            if normalized and normalized.group(0) not in approved_python:
+                findings.append(Finding(
+                    "POLICY_PYTHON_VERSION_NOT_APPROVED",
+                    "Python version is not approved by policy",
+                    "high",
+                    rel,
+                    f"{rel} uses Python {normalized.group(0)}, but approved versions are {sorted(approved_python)}.",
+                    "Align the serving runtime with the approved platform Python version.",
+                    "requires_confirmation",
+                ))
+
+    for key in policy.get("required_env_keys", []):
+        if key == "MLFLOW_TRACKING_URI":
+            continue
+        if not _has_env_key(context, key):
+            findings.append(Finding(
+                "POLICY_REQUIRED_ENV_MISSING",
+                "Required policy environment key is missing",
+                "high",
+                ".env.example",
+                f"KakaoPay policy requires {key} to be declared in env or config files.",
+                "Declare the key with a placeholder value and keep real values in the approved secret manager.",
+                "create_env_example" if key == "MLFLOW_TRACKING_URI" else "requires_confirmation",
+            ))
+
+    blocked_prefixes = tuple(policy.get("blocked_uri_prefixes", []))
+    if blocked_prefixes:
+        for rel, key, value in _extract_uri_values(context):
+            if value.startswith(blocked_prefixes):
+                findings.append(Finding(
+                    "POLICY_BLOCKED_URI_PREFIX",
+                    "URI is blocked by deployment policy",
+                    "critical",
+                    rel,
+                    f"{key} uses '{value}', which matches a blocked local or non-portable URI prefix.",
+                    "Use a registry or object-storage URI reachable from the serving cluster.",
+                    "requires_confirmation",
+                ))
+
+
+def validate_project(root: str | Path, policy_path: str | Path | None = None) -> ScanReport:
     context = scan_project(root)
+    policy = load_policy(policy_path)
     findings: list[Finding] = []
     _add_missing_core_files(context, findings)
     _validate_python(context, findings)
     _validate_requirements(context, findings)
     _validate_uris_and_paths(context, findings)
     _validate_docker_and_kserve(context, findings)
+    _validate_policy(context, findings, policy)
 
     penalty = sum(SEVERITY_SCORE.get(item.severity, 0) for item in findings)
     score = max(0, 100 - penalty)

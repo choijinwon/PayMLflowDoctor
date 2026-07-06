@@ -11,8 +11,8 @@
     "requirements.txt"
   ],
   "summary": {
-    "critical": 2,
-    "high": 3,
+    "critical": 4,
+    "high": 6,
     "medium": 2,
     "low": 1,
     "info": 0
@@ -88,6 +88,51 @@
       "file": "kserve.yaml",
       "message": "Local paths are not portable across Kubernetes nodes.",
       "recommendation": "Use object storage or PVC-backed paths approved for the serving cluster.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "POLICY_PYTHON_VERSION_NOT_APPROVED",
+      "title": "Python version is not approved by policy",
+      "severity": "high",
+      "file": "conda.yaml",
+      "message": "conda.yaml uses Python 3.9, but approved versions are ['3.11'].",
+      "recommendation": "Align the serving runtime with the approved platform Python version.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "POLICY_PYTHON_VERSION_NOT_APPROVED",
+      "title": "Python version is not approved by policy",
+      "severity": "high",
+      "file": "MLmodel",
+      "message": "MLmodel uses Python 3.9, but approved versions are ['3.11'].",
+      "recommendation": "Align the serving runtime with the approved platform Python version.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "POLICY_REQUIRED_ENV_MISSING",
+      "title": "Required policy environment key is missing",
+      "severity": "high",
+      "file": ".env.example",
+      "message": "KakaoPay policy requires MODEL_URI to be declared in env or config files.",
+      "recommendation": "Declare the key with a placeholder value and keep real values in the approved secret manager.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "POLICY_BLOCKED_URI_PREFIX",
+      "title": "URI is blocked by deployment policy",
+      "severity": "critical",
+      "file": "config.yaml",
+      "message": "model_uri uses 'file:C:\\Users\\pay\\model', which matches a blocked local or non-portable URI prefix.",
+      "recommendation": "Use a registry or object-storage URI reachable from the serving cluster.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "POLICY_BLOCKED_URI_PREFIX",
+      "title": "URI is blocked by deployment policy",
+      "severity": "critical",
+      "file": "kserve.yaml",
+      "message": "storageUri uses 'file:/models/fds-risk-model', which matches a blocked local or non-portable URI prefix.",
+      "recommendation": "Use a registry or object-storage URI reachable from the serving cluster.",
       "autofix": "requires_confirmation"
     }
   ]
