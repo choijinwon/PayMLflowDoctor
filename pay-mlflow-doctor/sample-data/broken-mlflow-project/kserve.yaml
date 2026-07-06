@@ -7,4 +7,4 @@ spec:
     model:
       modelFormat:
         name: mlflow
-      storageUri: file:/models/fds-risk-model
+      storageUri: file:./models/fds-risk-model

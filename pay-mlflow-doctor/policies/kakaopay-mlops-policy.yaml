@@ -23,6 +23,10 @@ allowed_remote_uri_prefixes:
 
 blocked_uri_prefixes:
   - file:
+  - ./
+  - ../
+  - .\
+  - ..\
   - /
   - C:
   - D:

@@ -1,5 +1,5 @@
 {
-  "project": "/Users/choijinwon/Documents/Codex/2026-07-07-role-openai-codex-plugin-architect-mlops/pay-mlflow-doctor/sample-data/broken-mlflow-project",
+  "project": "sample-data/broken-mlflow-project",
   "score": 0,
   "risk_level": "blocked",
   "files_scanned": [
@@ -132,7 +132,7 @@
       "title": "URI is blocked by deployment policy",
       "severity": "critical",
       "file": "config.yaml",
-      "message": "model_uri uses 'file:C:\\Users\\pay\\model', which matches a blocked local or non-portable URI prefix.",
+      "message": "model_uri uses '.\\models\\pay\\model', which matches a blocked local or non-portable URI prefix.",
       "recommendation": "Use a registry or object-storage URI reachable from the serving cluster.",
       "autofix": "requires_confirmation"
     },
@@ -141,7 +141,7 @@
       "title": "URI is blocked by deployment policy",
       "severity": "critical",
       "file": "kserve.yaml",
-      "message": "storageUri uses 'file:/models/fds-risk-model', which matches a blocked local or non-portable URI prefix.",
+      "message": "storageUri uses 'file:./models/fds-risk-model', which matches a blocked local or non-portable URI prefix.",
       "recommendation": "Use a registry or object-storage URI reachable from the serving cluster.",
       "autofix": "requires_confirmation"
     }

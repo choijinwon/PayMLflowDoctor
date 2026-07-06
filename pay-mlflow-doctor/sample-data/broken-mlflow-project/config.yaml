@@ -1,2 +1,2 @@
-model_uri: file:C:\Users\pay\model
+model_uri: .\models\pay\model
 service_name: fds-risk-model

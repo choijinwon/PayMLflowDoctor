@@ -4,7 +4,7 @@
 
 | Item | Value |
 | --- | --- |
-| Project | `/Users/choijinwon/Documents/Codex/2026-07-07-role-openai-codex-plugin-architect-mlops/pay-mlflow-doctor/sample-data/broken-mlflow-project` |
+| Project | `sample-data/broken-mlflow-project` |
 | Deployment Readiness Score | `0/100` |
 | Risk Level | `blocked` |
 | Files Scanned | `7` |
@@ -36,8 +36,8 @@
 | 10 | high | `POLICY_PYTHON_VERSION_NOT_APPROVED` | `conda.yaml` | conda.yaml uses Python 3.9, but approved versions are ['3.11']. | Align the serving runtime with the approved platform Python version. | Requires confirmation |
 | 11 | high | `POLICY_PYTHON_VERSION_NOT_APPROVED` | `MLmodel` | MLmodel uses Python 3.9, but approved versions are ['3.11']. | Align the serving runtime with the approved platform Python version. | Requires confirmation |
 | 12 | high | `POLICY_REQUIRED_ENV_MISSING` | `.env.example` | KakaoPay policy requires MODEL_URI to be declared in env or config files. | Declare the key with a placeholder value and keep real values in the approved secret manager. | Requires confirmation |
-| 13 | critical | `POLICY_BLOCKED_URI_PREFIX` | `config.yaml` | model_uri uses 'file:C:\Users\pay\model', which matches a blocked local or non-portable URI prefix. | Use a registry or object-storage URI reachable from the serving cluster. | Requires confirmation |
-| 14 | critical | `POLICY_BLOCKED_URI_PREFIX` | `kserve.yaml` | storageUri uses 'file:/models/fds-risk-model', which matches a blocked local or non-portable URI prefix. | Use a registry or object-storage URI reachable from the serving cluster. | Requires confirmation |
+| 13 | critical | `POLICY_BLOCKED_URI_PREFIX` | `config.yaml` | model_uri uses '.\models\pay\model', which matches a blocked local or non-portable URI prefix. | Use a registry or object-storage URI reachable from the serving cluster. | Requires confirmation |
+| 14 | critical | `POLICY_BLOCKED_URI_PREFIX` | `kserve.yaml` | storageUri uses 'file:./models/fds-risk-model', which matches a blocked local or non-portable URI prefix. | Use a registry or object-storage URI reachable from the serving cluster. | Requires confirmation |
 
 ## Fix Plan
 

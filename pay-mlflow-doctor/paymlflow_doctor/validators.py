@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import os
 import re
 import sys
 from pathlib import Path
@@ -289,7 +290,7 @@ def _validate_uris_and_paths(context: ScanContext, findings: list[Finding]) -> N
         ))
     for rel, text in context.text.items():
         if Path(rel).name in {"model.yaml", "config.yaml", "config.yml"}:
-            if re.search(r"model_uri\s*:\s*['\"]?file:", text):
+            if re.search(r"model_uri\s*:\s*['\"]?(file:|\.{1,2}[\\/]|[A-Za-z]:)", text):
                 findings.append(Finding(
                     "LOCAL_MODEL_URI",
                     "Model URI points to a local file path",
@@ -363,7 +364,7 @@ def _validate_docker_and_kserve(context: ScanContext, findings: list[Finding]) -
                     "Set predictor.model.storageUri to an artifact location reachable by the serving cluster.",
                     "requires_confirmation",
                 ))
-            if re.search(r"storageUri:\s*['\"]?(/|file:|[A-Za-z]:)", text):
+            if re.search(r"storageUri:\s*['\"]?(/|file:|\.{1,2}[\\/]|[A-Za-z]:)", text):
                 findings.append(Finding(
                     "KSERVE_LOCAL_STORAGE_URI",
                     "KServe storageUri uses a local path",
@@ -549,8 +550,9 @@ def validate_project(
     summary = {severity: 0 for severity in SEVERITY_SCORE}
     for finding in findings:
         summary[finding.severity] = summary.get(finding.severity, 0) + 1
+    project_path = os.path.relpath(Path(root).expanduser().resolve(), Path.cwd().resolve())
     return ScanReport(
-        project=str(Path(root).expanduser().resolve()),
+        project="." if project_path == "." else project_path,
         score=score,
         risk_level=risk_level,
         files_scanned=sorted(context.files),
