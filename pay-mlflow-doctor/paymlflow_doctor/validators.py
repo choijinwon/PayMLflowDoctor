@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import os
 import re
 import sys
 from pathlib import Path
@@ -52,6 +51,10 @@ def _has_env_key(context: ScanContext, key: str) -> bool:
     return False
 
 
+def _workspace_file(context: ScanContext, filename: str) -> str:
+    return context.rel(context.root / filename)
+
+
 def _add_missing_core_files(context: ScanContext, findings: list[Finding]) -> None:
     present_names = {Path(rel).name for rel in context.files}
     if "MLmodel" not in present_names:
@@ -59,7 +62,7 @@ def _add_missing_core_files(context: ScanContext, findings: list[Finding]) -> No
             "MLFLOW_MLMODEL_MISSING",
             "MLmodel file is missing",
             "critical",
-            ".",
+            _workspace_file(context, "MLmodel"),
             "MLflow model flavor metadata was not found, so serving compatibility cannot be verified.",
             "Export or copy the MLflow MLmodel file into the model artifact directory before deployment.",
         ))
@@ -68,7 +71,7 @@ def _add_missing_core_files(context: ScanContext, findings: list[Finding]) -> No
             "PYTHON_ENV_SPEC_MISSING",
             "Python environment specification is missing",
             "critical",
-            ".",
+            context.rel(context.root),
             "No requirements.txt, conda.yaml, or pyproject.toml was found.",
             "Add a pinned Python dependency file generated from the training or serving environment.",
             "generate_requirements",
@@ -78,7 +81,7 @@ def _add_missing_core_files(context: ScanContext, findings: list[Finding]) -> No
             "DOCKERFILE_MISSING",
             "Dockerfile is missing",
             "medium",
-            ".",
+            _workspace_file(context, "Dockerfile"),
             "Container build configuration was not found.",
             "Add a minimal Dockerfile or document the managed serving runtime used by KServe.",
         ))
@@ -283,7 +286,7 @@ def _validate_uris_and_paths(context: ScanContext, findings: list[Finding]) -> N
             "TRACKING_URI_MISSING",
             "MLFLOW_TRACKING_URI is not declared",
             "high",
-            ".env.example",
+            _workspace_file(context, ".env.example"),
             "The MLflow tracking endpoint is not visible in env/config files.",
             "Add MLFLOW_TRACKING_URI to .env.example and deployment secret documentation.",
             "create_env_example",
@@ -478,7 +481,7 @@ def _validate_policy(context: ScanContext, findings: list[Finding], policy: Poli
                 "POLICY_REQUIRED_FILE_MISSING",
                 "Required policy file is missing",
                 "high",
-                required_file,
+                _workspace_file(context, required_file),
                 f"KakaoPay policy requires {required_file}, but it was not found.",
                 "Add the required file or document the approved managed-runtime exception.",
                 "requires_confirmation",
@@ -507,7 +510,7 @@ def _validate_policy(context: ScanContext, findings: list[Finding], policy: Poli
                 "POLICY_REQUIRED_ENV_MISSING",
                 "Required policy environment key is missing",
                 "high",
-                ".env.example",
+                _workspace_file(context, ".env.example"),
                 f"KakaoPay policy requires {key} to be declared in env or config files.",
                 "Declare the key with a placeholder value and keep real values in the approved secret manager.",
                 "create_env_example" if key == "MLFLOW_TRACKING_URI" else "requires_confirmation",
@@ -560,7 +563,7 @@ def validate_project(
     summary = {severity: 0 for severity in SEVERITY_SCORE}
     for finding in findings:
         summary[finding.severity] = summary.get(finding.severity, 0) + 1
-    project_path = os.path.relpath(Path(root).expanduser().resolve(), Path.cwd().resolve())
+    project_path = context.rel(context.root)
     return ScanReport(
         project="." if project_path == "." else project_path,
         score=score,

@@ -28,9 +28,22 @@ TARGET_FILES = [
 EXCLUDE_DIRS = {".git", ".venv", "venv", "__pycache__", ".pytest_cache"}
 
 
+def _detect_workspace_root(project_root: Path) -> Path:
+    for candidate in (project_root, *project_root.parents):
+        if (candidate / ".git").exists() or (candidate / ".vscode").exists():
+            return candidate
+    cwd = Path.cwd().resolve()
+    try:
+        project_root.relative_to(cwd)
+        return cwd
+    except ValueError:
+        return project_root.parent
+
+
 def scan_project(root: str | Path) -> ScanContext:
     project_root = Path(root).expanduser().resolve()
-    context = ScanContext(root=project_root)
+    workspace_root = _detect_workspace_root(project_root)
+    context = ScanContext(root=project_root, workspace_root=workspace_root)
     for filename in TARGET_FILES:
         for path in project_root.rglob(filename):
             if any(part in EXCLUDE_DIRS for part in path.parts):

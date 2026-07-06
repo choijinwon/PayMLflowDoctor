@@ -1,15 +1,15 @@
 {
-  "project": "sample-data/broken-mlflow-project",
+  "project": "pay-mlflow-doctor/sample-data/broken-mlflow-project",
   "score": 0,
   "risk_level": "blocked",
   "files_scanned": [
-    "Dockerfile",
-    "MLmodel",
-    "conda.yaml",
-    "config.yaml",
-    "kserve.yaml",
-    "model_code.py",
-    "requirements.txt"
+    "pay-mlflow-doctor/sample-data/broken-mlflow-project/Dockerfile",
+    "pay-mlflow-doctor/sample-data/broken-mlflow-project/MLmodel",
+    "pay-mlflow-doctor/sample-data/broken-mlflow-project/conda.yaml",
+    "pay-mlflow-doctor/sample-data/broken-mlflow-project/config.yaml",
+    "pay-mlflow-doctor/sample-data/broken-mlflow-project/kserve.yaml",
+    "pay-mlflow-doctor/sample-data/broken-mlflow-project/model_code.py",
+    "pay-mlflow-doctor/sample-data/broken-mlflow-project/requirements.txt"
   ],
   "summary": {
     "critical": 4,
@@ -23,8 +23,8 @@
       "id": "PYTHON_VERSION_MISMATCH",
       "title": "Python versions do not match",
       "severity": "high",
-      "file": "conda.yaml, Dockerfile, MLmodel",
-      "message": "Detected inconsistent Python versions: {'conda.yaml': '3.9', 'Dockerfile': '3.11', 'MLmodel': '3.9'}.",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/conda.yaml, pay-mlflow-doctor/sample-data/broken-mlflow-project/Dockerfile, pay-mlflow-doctor/sample-data/broken-mlflow-project/MLmodel",
+      "message": "Detected inconsistent Python versions: {'pay-mlflow-doctor/sample-data/broken-mlflow-project/conda.yaml': '3.9', 'pay-mlflow-doctor/sample-data/broken-mlflow-project/Dockerfile': '3.11', 'pay-mlflow-doctor/sample-data/broken-mlflow-project/MLmodel': '3.9'}.",
       "recommendation": "Choose one serving Python version and align conda.yaml, Dockerfile, MLmodel, and pyproject.toml.",
       "autofix": "requires_confirmation"
     },
@@ -32,7 +32,7 @@
       "id": "UNPINNED_DEPENDENCIES",
       "title": "Unpinned dependencies reduce reproducibility",
       "severity": "medium",
-      "file": "requirements.txt",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/requirements.txt",
       "message": "Unpinned packages detected: mlflow, pandas, numpy.",
       "recommendation": "Pin production serving dependencies to exact versions for reproducible financial AI deployment.",
       "autofix": "requires_confirmation"
@@ -41,7 +41,7 @@
       "id": "IMPORT_NOT_DECLARED",
       "title": "Imported package is not declared in requirements.txt",
       "severity": "medium",
-      "file": "model_code.py",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/model_code.py",
       "message": "Python code imports 'xgboost', but 'xgboost' is not declared in requirements.txt.",
       "recommendation": "Add the serving dependency to requirements.txt or remove the unused import before deployment.",
       "autofix": "requires_confirmation"
@@ -50,7 +50,7 @@
       "id": "TRACKING_URI_MISSING",
       "title": "MLFLOW_TRACKING_URI is not declared",
       "severity": "high",
-      "file": ".env.example",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/.env.example",
       "message": "The MLflow tracking endpoint is not visible in env/config files.",
       "recommendation": "Add MLFLOW_TRACKING_URI to .env.example and deployment secret documentation.",
       "autofix": "create_env_example"
@@ -59,7 +59,7 @@
       "id": "LOCAL_MODEL_URI",
       "title": "Model URI points to a local file path",
       "severity": "high",
-      "file": "config.yaml",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/config.yaml",
       "message": "Local file model_uri values usually fail after containerization or KServe deployment.",
       "recommendation": "Use models:/, runs:/, s3://, gs://, or a platform artifact URI reachable from the serving cluster.",
       "autofix": "requires_confirmation"
@@ -68,7 +68,7 @@
       "id": "WINDOWS_PATH_IN_CONFIG",
       "title": "Windows path separator detected",
       "severity": "medium",
-      "file": "config.yaml",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/config.yaml",
       "message": "Backslash paths can break in Linux containers and Kubernetes pods.",
       "recommendation": "Use POSIX-style paths or URI schemes for cross-platform deployment.",
       "autofix": "normalize_paths"
@@ -77,7 +77,7 @@
       "id": "ARTIFACT_PATH_MISSING",
       "title": "Referenced artifact path does not exist",
       "severity": "critical",
-      "file": "MLmodel",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/MLmodel",
       "message": "MLmodel references 'missing-model.pkl', but the path was not found.",
       "recommendation": "Verify artifact packaging before deployment and ensure the model directory contains referenced files.",
       "autofix": "none"
@@ -86,7 +86,7 @@
       "id": "DOCKER_WORKDIR_MISSING",
       "title": "Dockerfile has no WORKDIR",
       "severity": "low",
-      "file": "Dockerfile",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/Dockerfile",
       "message": "A missing WORKDIR often causes relative artifact and app paths to resolve differently.",
       "recommendation": "Add WORKDIR /app and copy model/application files relative to it.",
       "autofix": "insert_workdir"
@@ -95,7 +95,7 @@
       "id": "KSERVE_LOCAL_STORAGE_URI",
       "title": "KServe storageUri uses a local path",
       "severity": "critical",
-      "file": "kserve.yaml",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/kserve.yaml",
       "message": "Local paths are not portable across Kubernetes nodes.",
       "recommendation": "Use object storage or PVC-backed paths approved for the serving cluster.",
       "autofix": "requires_confirmation"
@@ -104,8 +104,8 @@
       "id": "POLICY_PYTHON_VERSION_NOT_APPROVED",
       "title": "Python version is not approved by policy",
       "severity": "high",
-      "file": "conda.yaml",
-      "message": "conda.yaml uses Python 3.9, but approved versions are ['3.11'].",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/conda.yaml",
+      "message": "pay-mlflow-doctor/sample-data/broken-mlflow-project/conda.yaml uses Python 3.9, but approved versions are ['3.11'].",
       "recommendation": "Align the serving runtime with the approved platform Python version.",
       "autofix": "requires_confirmation"
     },
@@ -113,8 +113,8 @@
       "id": "POLICY_PYTHON_VERSION_NOT_APPROVED",
       "title": "Python version is not approved by policy",
       "severity": "high",
-      "file": "MLmodel",
-      "message": "MLmodel uses Python 3.9, but approved versions are ['3.11'].",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/MLmodel",
+      "message": "pay-mlflow-doctor/sample-data/broken-mlflow-project/MLmodel uses Python 3.9, but approved versions are ['3.11'].",
       "recommendation": "Align the serving runtime with the approved platform Python version.",
       "autofix": "requires_confirmation"
     },
@@ -122,7 +122,7 @@
       "id": "POLICY_REQUIRED_ENV_MISSING",
       "title": "Required policy environment key is missing",
       "severity": "high",
-      "file": ".env.example",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/.env.example",
       "message": "KakaoPay policy requires MODEL_URI to be declared in env or config files.",
       "recommendation": "Declare the key with a placeholder value and keep real values in the approved secret manager.",
       "autofix": "requires_confirmation"
@@ -131,7 +131,7 @@
       "id": "POLICY_BLOCKED_URI_PREFIX",
       "title": "URI is blocked by deployment policy",
       "severity": "critical",
-      "file": "config.yaml",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/config.yaml",
       "message": "model_uri uses '.\\models\\pay\\model', which matches a blocked local or non-portable URI prefix.",
       "recommendation": "Use a registry or object-storage URI reachable from the serving cluster.",
       "autofix": "requires_confirmation"
@@ -140,7 +140,7 @@
       "id": "POLICY_BLOCKED_URI_PREFIX",
       "title": "URI is blocked by deployment policy",
       "severity": "critical",
-      "file": "kserve.yaml",
+      "file": "pay-mlflow-doctor/sample-data/broken-mlflow-project/kserve.yaml",
       "message": "storageUri uses 'file:./models/fds-risk-model', which matches a blocked local or non-portable URI prefix.",
       "recommendation": "Use a registry or object-storage URI reachable from the serving cluster.",
       "autofix": "requires_confirmation"

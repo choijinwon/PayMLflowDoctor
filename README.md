@@ -5,7 +5,7 @@ MLflow Environment Validator & Deployment Copilot for financial AI deployment.
 PayMLflow Doctor is a Codex Plugin and Python rule engine that catches MLflow, Docker, KServe, Python, URI, and artifact configuration risks before a model is released. It is built for the KakaoPay AX Hackathon as a practical MLOps safety copilot for FDS, recommendation, OCR, anomaly detection, and other financial AI services.
 
 The default analysis output is a Markdown table report designed for demos, pull request reviews, and release approval.
-Report paths are rendered as relative paths so generated output is portable across developer machines and CI runners.
+Report paths are rendered as workspace-relative paths so generated output is portable across developer machines and CI runners.
 
 ## Quick Demo
 
@@ -29,7 +29,7 @@ In VSCode, run `Tasks: Run Task` and choose:
 - `PayMLflow Doctor: Validate Broken Project`
 - `PayMLflow Doctor: Show Python Environment`
 
-macOS users can run the same commands from Terminal or VSCode's integrated zsh terminal. Reports render project files as relative paths and flag macOS-only local paths before deployment.
+macOS users can run the same commands from Terminal or VSCode's integrated zsh terminal. Reports render project files as workspace-relative paths and flag macOS-only local paths before deployment.
 
 Check the current Python environment package list:
 

@@ -39,12 +39,13 @@ class Finding:
 @dataclass
 class ScanContext:
     root: Path
+    workspace_root: Path
     files: dict[str, Path] = field(default_factory=dict)
     text: dict[str, str] = field(default_factory=dict)
 
     def rel(self, path: Path) -> str:
         try:
-            return str(path.relative_to(self.root))
+            return str(path.relative_to(self.workspace_root))
         except ValueError:
             return str(path)
 
