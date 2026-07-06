@@ -290,7 +290,7 @@ def _validate_uris_and_paths(context: ScanContext, findings: list[Finding]) -> N
         ))
     for rel, text in context.text.items():
         if Path(rel).name in {"model.yaml", "config.yaml", "config.yml"}:
-            if re.search(r"model_uri\s*:\s*['\"]?(file:|\.{1,2}[\\/]|[A-Za-z]:)", text):
+            if re.search(r"model_uri\s*:\s*['\"]?(file:|\.{1,2}[\\/]|[A-Za-z]:|/Users/|/Volumes/|/private/)", text):
                 findings.append(Finding(
                     "LOCAL_MODEL_URI",
                     "Model URI points to a local file path",
@@ -309,6 +309,16 @@ def _validate_uris_and_paths(context: ScanContext, findings: list[Finding]) -> N
                     "Backslash paths can break in Linux containers and Kubernetes pods.",
                     "Use POSIX-style paths or URI schemes for cross-platform deployment.",
                     "normalize_paths",
+                ))
+            if re.search(r"(/Users/|/Volumes/|/private/)", text):
+                findings.append(Finding(
+                    "MACOS_PATH_IN_CONFIG",
+                    "macOS local path detected",
+                    "medium",
+                    rel,
+                    "macOS-only local paths can break in Linux containers and Kubernetes pods.",
+                    "Use project-relative paths for local development or registry/object-storage URIs for deployment.",
+                    "requires_confirmation",
                 ))
     mlmodel = _find_file(context, "MLmodel")
     if mlmodel:
@@ -364,7 +374,7 @@ def _validate_docker_and_kserve(context: ScanContext, findings: list[Finding]) -
                     "Set predictor.model.storageUri to an artifact location reachable by the serving cluster.",
                     "requires_confirmation",
                 ))
-            if re.search(r"storageUri:\s*['\"]?(/|file:|\.{1,2}[\\/]|[A-Za-z]:)", text):
+            if re.search(r"storageUri:\s*['\"]?(/|file:|\.{1,2}[\\/]|[A-Za-z]:|/Users/|/Volumes/|/private/)", text):
                 findings.append(Finding(
                     "KSERVE_LOCAL_STORAGE_URI",
                     "KServe storageUri uses a local path",

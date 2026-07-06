@@ -50,6 +50,16 @@ class ValidatorTest(unittest.TestCase):
             report = validate_project(root, check_python_env=True)
             self.assertTrue(any(finding.id == "PYTHON_ENV_PACKAGE_MISSING" for finding in report.findings))
 
+    def test_macos_absolute_paths_are_detected(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "MLmodel").write_text("python_version: 3.11\n", encoding="utf-8")
+            (root / "requirements.txt").write_text("mlflow==2.12.1\n", encoding="utf-8")
+            (root / "config.yaml").write_text("model_uri: /Users/demo/model\n", encoding="utf-8")
+            report = validate_project(root)
+            self.assertTrue(any(finding.id == "MACOS_PATH_IN_CONFIG" for finding in report.findings))
+            self.assertTrue(any(finding.id == "LOCAL_MODEL_URI" for finding in report.findings))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,6 +27,9 @@ blocked_uri_prefixes:
   - ../
   - .\
   - ..\
+  - /Users/
+  - /Volumes/
+  - /private/
   - /
   - C:
   - D:

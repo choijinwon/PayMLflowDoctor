@@ -53,6 +53,7 @@ Scan the target MLflow project for deployment-blocking environment risks. Inspec
 ```
 
 Also check for hardcoded IDs, passwords, tokens, API keys, and credential-like values. Never print the actual credential value in the report.
+For macOS users, flag local paths such as `/Users/...`, `/Volumes/...`, and `/private/...` because they will not resolve inside Linux containers or Kubernetes pods.
 
 When the user asks to check the current Python environment package list, run:
 

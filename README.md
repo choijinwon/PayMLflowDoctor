@@ -29,6 +29,8 @@ In VSCode, run `Tasks: Run Task` and choose:
 - `PayMLflow Doctor: Validate Broken Project`
 - `PayMLflow Doctor: Show Python Environment`
 
+macOS users can run the same commands from Terminal or VSCode's integrated zsh terminal. Reports render project files as relative paths and flag macOS-only local paths before deployment.
+
 Check the current Python environment package list:
 
 ```bash
@@ -42,6 +44,7 @@ python -m paymlflow_doctor.cli validate sample-data/broken-mlflow-project --chec
 - Missing `MLFLOW_TRACKING_URI`
 - Local `file:` model URIs
 - Windows paths that break Linux containers
+- macOS local paths such as `/Users/...`, `/Volumes/...`, and `/private/...`
 - Missing MLflow artifact paths
 - Unsafe KServe local `storageUri`
 - Unpinned Python dependencies
