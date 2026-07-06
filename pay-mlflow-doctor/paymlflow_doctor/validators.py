@@ -223,6 +223,77 @@ def _validate_docker_and_kserve(context: ScanContext, findings: list[Finding]) -
                 ))
 
 
+def _validate_credentials(context: ScanContext, findings: list[Finding]) -> None:
+    sensitive_names = (
+        "password",
+        "passwd",
+        "pwd",
+        "username",
+        "user_id",
+        "userid",
+        "api_key",
+        "apikey",
+        "secret",
+        "token",
+        "access_key",
+        "client_secret",
+        "credential",
+    )
+    placeholder_values = {
+        "",
+        "changeme",
+        "change-me",
+        "example",
+        "placeholder",
+        "dummy",
+        "your-value",
+        "your-secret",
+        "<secret>",
+        "<password>",
+    }
+    target_files = {
+        ".env",
+        ".env.example",
+        "config.yaml",
+        "config.yml",
+        "model.yaml",
+        "deployment.yaml",
+        "deployment.yml",
+        "serving.yaml",
+        "serving.yml",
+        "kserve.yaml",
+        "kserve.yml",
+        "Dockerfile",
+    }
+    for rel, text in context.text.items():
+        if Path(rel).name not in target_files:
+            continue
+        for line_number, raw_line in enumerate(text.splitlines(), start=1):
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if not any(name in line.lower() for name in sensitive_names):
+                continue
+            match = re.match(r"([A-Za-z_][A-Za-z0-9_-]*)\s*[:=]\s*(.*)", line)
+            if not match:
+                continue
+            key = match.group(1)
+            value = match.group(2).strip().strip("'\"")
+            if not any(name in key.lower() for name in sensitive_names):
+                continue
+            if value.lower() in placeholder_values or value.startswith("${") or value.startswith("<"):
+                continue
+            findings.append(Finding(
+                "CREDENTIAL_VALUE_PRESENT",
+                "Credential-like value is hardcoded",
+                "critical",
+                f"{rel}:{line_number}",
+                f"{key} appears to contain a hardcoded credential-like value. The value is intentionally masked.",
+                "Remove real IDs, passwords, tokens, and API keys from repository files. Use placeholders and an approved secret manager.",
+                "none",
+            ))
+
+
 def _extract_uri_values(context: ScanContext) -> list[tuple[str, str, str]]:
     values: list[tuple[str, str, str]] = []
     for rel, text in context.text.items():
@@ -303,6 +374,7 @@ def validate_project(root: str | Path, policy_path: str | Path | None = None) ->
     _validate_requirements(context, findings)
     _validate_uris_and_paths(context, findings)
     _validate_docker_and_kserve(context, findings)
+    _validate_credentials(context, findings)
     _validate_policy(context, findings, policy)
 
     penalty = sum(SEVERITY_SCORE.get(item.severity, 0) for item in findings)

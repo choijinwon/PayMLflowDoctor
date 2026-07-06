@@ -1,4 +1,6 @@
 import unittest
+from tempfile import TemporaryDirectory
+from pathlib import Path
 
 from paymlflow_doctor.validators import validate_project
 
@@ -24,6 +26,17 @@ class ValidatorTest(unittest.TestCase):
     def test_policy_pack_allows_healthy_project(self):
         report = validate_project("sample-data/healthy-mlflow-project", "policies/kakaopay-mlops-policy.yaml")
         self.assertFalse(any(finding.id.startswith("POLICY_") for finding in report.findings))
+
+    def test_credential_values_are_masked_and_blocked(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "MLmodel").write_text("python_version: 3.11\n", encoding="utf-8")
+            (root / "requirements.txt").write_text("mlflow==2.12.1\n", encoding="utf-8")
+            (root / ".env").write_text("DB_PASSWORD=demo-value-do-not-use\n", encoding="utf-8")
+            report = validate_project(root)
+            finding = next(item for item in report.findings if item.id == "CREDENTIAL_VALUE_PRESENT")
+            self.assertEqual(finding.severity, "critical")
+            self.assertNotIn("demo-value-do-not-use", finding.message)
 
 
 if __name__ == "__main__":

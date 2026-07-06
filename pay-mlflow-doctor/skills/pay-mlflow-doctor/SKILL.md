@@ -52,6 +52,8 @@ Prompt:
 Scan the target MLflow project for deployment-blocking environment risks. Inspect requirements.txt, conda.yaml, pyproject.toml, Dockerfile, MLmodel, config files, .env files, KServe manifests, model URIs, and artifact paths. Return a readiness score, severity-ranked findings, and release recommendation.
 ```
 
+Also check for hardcoded IDs, passwords, tokens, API keys, and credential-like values. Never print the actual credential value in the report.
+
 ### Fix Environment
 
 Trigger phrases:
@@ -132,6 +134,7 @@ Requires user confirmation:
 Do not auto-fix:
 
 - Secrets.
+- Real IDs, passwords, tokens, API keys, or credential values.
 - Production endpoint values.
 - Registry credentials.
 - Object storage permissions.

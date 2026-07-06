@@ -29,6 +29,7 @@ cd pay-mlflow-doctor
 - Missing MLflow artifact paths
 - Unsafe KServe local `storageUri`
 - Unpinned Python dependencies
+- Hardcoded ID, password, token, API key detection with value masking
 - Enterprise policy violations from `policies/kakaopay-mlops-policy.yaml`
 
 ## Repository Layout
