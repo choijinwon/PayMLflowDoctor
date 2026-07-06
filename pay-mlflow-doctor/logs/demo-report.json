@@ -8,12 +8,13 @@
     "conda.yaml",
     "config.yaml",
     "kserve.yaml",
+    "model_code.py",
     "requirements.txt"
   ],
   "summary": {
     "critical": 4,
     "high": 6,
-    "medium": 2,
+    "medium": 3,
     "low": 1,
     "info": 0
   },
@@ -34,6 +35,15 @@
       "file": "requirements.txt",
       "message": "Unpinned packages detected: mlflow, pandas, numpy.",
       "recommendation": "Pin production serving dependencies to exact versions for reproducible financial AI deployment.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "IMPORT_NOT_DECLARED",
+      "title": "Imported package is not declared in requirements.txt",
+      "severity": "medium",
+      "file": "model_code.py",
+      "message": "Python code imports 'xgboost', but 'xgboost' is not declared in requirements.txt.",
+      "recommendation": "Add the serving dependency to requirements.txt or remove the unused import before deployment.",
       "autofix": "requires_confirmation"
     },
     {

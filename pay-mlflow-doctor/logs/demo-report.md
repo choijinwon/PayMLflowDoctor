@@ -3,7 +3,7 @@
 - Project: `/Users/choijinwon/Documents/Codex/2026-07-07-role-openai-codex-plugin-architect-mlops/pay-mlflow-doctor/sample-data/broken-mlflow-project`
 - Deployment readiness score: `0/100`
 - Risk level: `blocked`
-- Files scanned: `6`
+- Files scanned: `7`
 
 ## Findings
 
@@ -25,7 +25,16 @@
 - Recommendation: Pin production serving dependencies to exact versions for reproducible financial AI deployment.
 - Auto fix: `requires_confirmation`
 
-### 3. MLFLOW_TRACKING_URI is not declared
+### 3. Imported package is not declared in requirements.txt
+
+- ID: `IMPORT_NOT_DECLARED`
+- Severity: `medium`
+- File: `model_code.py`
+- Message: Python code imports 'xgboost', but 'xgboost' is not declared in requirements.txt.
+- Recommendation: Add the serving dependency to requirements.txt or remove the unused import before deployment.
+- Auto fix: `requires_confirmation`
+
+### 4. MLFLOW_TRACKING_URI is not declared
 
 - ID: `TRACKING_URI_MISSING`
 - Severity: `high`
@@ -34,7 +43,7 @@
 - Recommendation: Add MLFLOW_TRACKING_URI to .env.example and deployment secret documentation.
 - Auto fix: `create_env_example`
 
-### 4. Model URI points to a local file path
+### 5. Model URI points to a local file path
 
 - ID: `LOCAL_MODEL_URI`
 - Severity: `high`
@@ -43,7 +52,7 @@
 - Recommendation: Use models:/, runs:/, s3://, gs://, or a platform artifact URI reachable from the serving cluster.
 - Auto fix: `requires_confirmation`
 
-### 5. Windows path separator detected
+### 6. Windows path separator detected
 
 - ID: `WINDOWS_PATH_IN_CONFIG`
 - Severity: `medium`
@@ -52,7 +61,7 @@
 - Recommendation: Use POSIX-style paths or URI schemes for cross-platform deployment.
 - Auto fix: `normalize_paths`
 
-### 6. Referenced artifact path does not exist
+### 7. Referenced artifact path does not exist
 
 - ID: `ARTIFACT_PATH_MISSING`
 - Severity: `critical`
@@ -61,7 +70,7 @@
 - Recommendation: Verify artifact packaging before deployment and ensure the model directory contains referenced files.
 - Auto fix: `none`
 
-### 7. Dockerfile has no WORKDIR
+### 8. Dockerfile has no WORKDIR
 
 - ID: `DOCKER_WORKDIR_MISSING`
 - Severity: `low`
@@ -70,7 +79,7 @@
 - Recommendation: Add WORKDIR /app and copy model/application files relative to it.
 - Auto fix: `insert_workdir`
 
-### 8. KServe storageUri uses a local path
+### 9. KServe storageUri uses a local path
 
 - ID: `KSERVE_LOCAL_STORAGE_URI`
 - Severity: `critical`
@@ -79,7 +88,7 @@
 - Recommendation: Use object storage or PVC-backed paths approved for the serving cluster.
 - Auto fix: `requires_confirmation`
 
-### 9. Python version is not approved by policy
+### 10. Python version is not approved by policy
 
 - ID: `POLICY_PYTHON_VERSION_NOT_APPROVED`
 - Severity: `high`
@@ -88,7 +97,7 @@
 - Recommendation: Align the serving runtime with the approved platform Python version.
 - Auto fix: `requires_confirmation`
 
-### 10. Python version is not approved by policy
+### 11. Python version is not approved by policy
 
 - ID: `POLICY_PYTHON_VERSION_NOT_APPROVED`
 - Severity: `high`
@@ -97,7 +106,7 @@
 - Recommendation: Align the serving runtime with the approved platform Python version.
 - Auto fix: `requires_confirmation`
 
-### 11. Required policy environment key is missing
+### 12. Required policy environment key is missing
 
 - ID: `POLICY_REQUIRED_ENV_MISSING`
 - Severity: `high`
@@ -106,7 +115,7 @@
 - Recommendation: Declare the key with a placeholder value and keep real values in the approved secret manager.
 - Auto fix: `requires_confirmation`
 
-### 12. URI is blocked by deployment policy
+### 13. URI is blocked by deployment policy
 
 - ID: `POLICY_BLOCKED_URI_PREFIX`
 - Severity: `critical`
@@ -115,7 +124,7 @@
 - Recommendation: Use a registry or object-storage URI reachable from the serving cluster.
 - Auto fix: `requires_confirmation`
 
-### 13. URI is blocked by deployment policy
+### 14. URI is blocked by deployment policy
 
 - ID: `POLICY_BLOCKED_URI_PREFIX`
 - Severity: `critical`

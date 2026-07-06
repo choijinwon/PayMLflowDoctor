@@ -38,6 +38,18 @@ class ValidatorTest(unittest.TestCase):
             self.assertEqual(finding.severity, "critical")
             self.assertNotIn("demo-value-do-not-use", finding.message)
 
+    def test_imports_must_be_declared_in_requirements(self):
+        report = validate_project("sample-data/broken-mlflow-project")
+        self.assertTrue(any(finding.id == "IMPORT_NOT_DECLARED" for finding in report.findings))
+
+    def test_current_python_env_check_uses_installed_package_list(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "MLmodel").write_text("python_version: 3.11\n", encoding="utf-8")
+            (root / "requirements.txt").write_text("package-that-should-not-exist-paymlflow==1.0.0\n", encoding="utf-8")
+            report = validate_project(root, check_python_env=True)
+            self.assertTrue(any(finding.id == "PYTHON_ENV_PACKAGE_MISSING" for finding in report.findings))
+
 
 if __name__ == "__main__":
     unittest.main()

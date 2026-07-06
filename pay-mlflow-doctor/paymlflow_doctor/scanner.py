@@ -25,13 +25,15 @@ TARGET_FILES = [
     "serving.yml",
 ]
 
+EXCLUDE_DIRS = {".git", ".venv", "venv", "__pycache__", ".pytest_cache"}
+
 
 def scan_project(root: str | Path) -> ScanContext:
     project_root = Path(root).expanduser().resolve()
     context = ScanContext(root=project_root)
     for filename in TARGET_FILES:
         for path in project_root.rglob(filename):
-            if any(part.startswith(".git") for part in path.parts):
+            if any(part in EXCLUDE_DIRS for part in path.parts):
                 continue
             rel = context.rel(path)
             context.files[rel] = path
@@ -39,4 +41,15 @@ def scan_project(root: str | Path) -> ScanContext:
                 context.text[rel] = path.read_text(encoding="utf-8")
             except UnicodeDecodeError:
                 context.text[rel] = path.read_text(encoding="utf-8", errors="replace")
+    for path in project_root.rglob("*.py"):
+        if any(part in EXCLUDE_DIRS for part in path.parts):
+            continue
+        rel = context.rel(path)
+        if rel in context.files:
+            continue
+        context.files[rel] = path
+        try:
+            context.text[rel] = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            context.text[rel] = path.read_text(encoding="utf-8", errors="replace")
     return context

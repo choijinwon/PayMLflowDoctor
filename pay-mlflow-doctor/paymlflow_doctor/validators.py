@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import ast
 import re
+import sys
 from pathlib import Path
 
+from .environment import installed_packages, normalize_package_name
 from .models import Finding, SEVERITY_SCORE, ScanContext, ScanReport
 from .policy import Policy, load_policy
 from .scanner import scan_project
@@ -122,6 +125,155 @@ def _validate_requirements(context: ScanContext, findings: list[Finding]) -> Non
             "Pin production serving dependencies to exact versions for reproducible financial AI deployment.",
             "requires_confirmation",
         ))
+
+
+def _requirement_specs(context: ScanContext) -> dict[str, tuple[str | None, str | None, str]]:
+    req = _find_file(context, "requirements.txt")
+    if not req:
+        return {}
+    rel, text = req
+    specs: dict[str, tuple[str | None, str | None, str]] = {}
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or line.startswith("-") or "://" in line:
+            continue
+        match = re.match(r"([A-Za-z0-9_.-]+)\s*([=<>!~]{1,2})?\s*([^;\s]+)?", line)
+        if not match:
+            continue
+        name, operator, version = match.groups()
+        specs[normalize_package_name(name)] = (operator, version, rel)
+    return specs
+
+
+IMPORT_TO_PACKAGE = {
+    "PIL": "pillow",
+    "cv2": "opencv-python",
+    "sklearn": "scikit-learn",
+    "yaml": "pyyaml",
+}
+
+
+def _is_stdlib_module(name: str) -> bool:
+    stdlib = getattr(sys, "stdlib_module_names", {
+        "argparse",
+        "ast",
+        "collections",
+        "dataclasses",
+        "datetime",
+        "functools",
+        "importlib",
+        "itertools",
+        "json",
+        "logging",
+        "math",
+        "os",
+        "pathlib",
+        "re",
+        "subprocess",
+        "sys",
+        "tempfile",
+        "typing",
+        "unittest",
+    })
+    return name in stdlib
+
+
+def _extract_python_imports(context: ScanContext) -> dict[str, list[str]]:
+    imports: dict[str, list[str]] = {}
+    for rel, text in context.text.items():
+        if not rel.endswith(".py"):
+            continue
+        try:
+            tree = ast.parse(text)
+        except SyntaxError:
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    module = alias.name.split(".", 1)[0]
+                    if module and not _is_stdlib_module(module):
+                        imports.setdefault(module, []).append(rel)
+            elif isinstance(node, ast.ImportFrom):
+                if node.level > 0 or not node.module:
+                    continue
+                module = node.module.split(".", 1)[0]
+                if module and not _is_stdlib_module(module):
+                    imports.setdefault(module, []).append(rel)
+    return imports
+
+
+def _package_for_import(module: str) -> str:
+    return normalize_package_name(IMPORT_TO_PACKAGE.get(module, module))
+
+
+def _is_local_module(context: ScanContext, module: str) -> bool:
+    return (context.root / f"{module}.py").exists() or (context.root / module).is_dir()
+
+
+def _validate_dependency_import_alignment(context: ScanContext, findings: list[Finding]) -> None:
+    specs = _requirement_specs(context)
+    if not specs:
+        return
+    imports = _extract_python_imports(context)
+    declared = set(specs)
+    for module, files in sorted(imports.items()):
+        if _is_local_module(context, module):
+            continue
+        package = _package_for_import(module)
+        if package not in declared:
+            findings.append(Finding(
+                "IMPORT_NOT_DECLARED",
+                "Imported package is not declared in requirements.txt",
+                "medium",
+                ", ".join(sorted(set(files))),
+                f"Python code imports '{module}', but '{package}' is not declared in requirements.txt.",
+                "Add the serving dependency to requirements.txt or remove the unused import before deployment.",
+                "requires_confirmation",
+            ))
+
+
+def _validate_current_python_environment(context: ScanContext, findings: list[Finding]) -> None:
+    specs = _requirement_specs(context)
+    packages = installed_packages()
+    for package, (operator, version, rel) in sorted(specs.items()):
+        installed = packages.get(package)
+        if not installed:
+            findings.append(Finding(
+                "PYTHON_ENV_PACKAGE_MISSING",
+                "Required package is not installed in current Python environment",
+                "high",
+                rel,
+                f"requirements.txt declares '{package}', but it was not found in the current Python environment.",
+                "Install the missing package in the serving environment or rebuild the environment from requirements.txt.",
+                "requires_confirmation",
+            ))
+            continue
+        if operator == "==" and version and installed != version:
+            findings.append(Finding(
+                "PYTHON_ENV_PACKAGE_VERSION_MISMATCH",
+                "Installed package version does not match requirements.txt",
+                "high",
+                rel,
+                f"requirements.txt pins '{package}=={version}', but the current Python environment has '{installed}'.",
+                "Recreate the environment from the pinned requirements or update the lock file intentionally.",
+                "requires_confirmation",
+            ))
+
+    imports = _extract_python_imports(context)
+    for module, files in sorted(imports.items()):
+        if _is_local_module(context, module):
+            continue
+        package = _package_for_import(module)
+        if package not in packages:
+            findings.append(Finding(
+                "PYTHON_ENV_IMPORT_PACKAGE_MISSING",
+                "Imported package is missing from current Python environment",
+                "high",
+                ", ".join(sorted(set(files))),
+                f"Python code imports '{module}', but package '{package}' was not found in the current Python environment.",
+                "Install the package in the active Python environment or correct the model dependency spec.",
+                "requires_confirmation",
+            ))
 
 
 def _validate_uris_and_paths(context: ScanContext, findings: list[Finding]) -> None:
@@ -365,13 +517,20 @@ def _validate_policy(context: ScanContext, findings: list[Finding], policy: Poli
                 ))
 
 
-def validate_project(root: str | Path, policy_path: str | Path | None = None) -> ScanReport:
+def validate_project(
+    root: str | Path,
+    policy_path: str | Path | None = None,
+    check_python_env: bool = False,
+) -> ScanReport:
     context = scan_project(root)
     policy = load_policy(policy_path)
     findings: list[Finding] = []
     _add_missing_core_files(context, findings)
     _validate_python(context, findings)
     _validate_requirements(context, findings)
+    _validate_dependency_import_alignment(context, findings)
+    if check_python_env:
+        _validate_current_python_environment(context, findings)
     _validate_uris_and_paths(context, findings)
     _validate_docker_and_kserve(context, findings)
     _validate_credentials(context, findings)

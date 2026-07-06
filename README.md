@@ -20,6 +20,13 @@ cd pay-mlflow-doctor
 ./scripts/demo.sh
 ```
 
+Check the current Python environment package list:
+
+```bash
+python -m paymlflow_doctor.cli python-env --format markdown --limit 30
+python -m paymlflow_doctor.cli validate sample-data/broken-mlflow-project --check-python-env
+```
+
 ## What It Finds
 
 - Python version mismatch across `conda.yaml`, `Dockerfile`, `MLmodel`, and `pyproject.toml`
@@ -29,6 +36,8 @@ cd pay-mlflow-doctor
 - Missing MLflow artifact paths
 - Unsafe KServe local `storageUri`
 - Unpinned Python dependencies
+- Model-code imports missing from `requirements.txt`
+- Optional current Python environment checks from installed package metadata
 - Hardcoded ID, password, token, API key detection with value masking
 - Enterprise policy violations from `policies/kakaopay-mlops-policy.yaml`
 

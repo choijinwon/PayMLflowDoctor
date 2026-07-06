@@ -49,10 +49,17 @@ Trigger phrases:
 Prompt:
 
 ```text
-Scan the target MLflow project for deployment-blocking environment risks. Inspect requirements.txt, conda.yaml, pyproject.toml, Dockerfile, MLmodel, config files, .env files, KServe manifests, model URIs, and artifact paths. Return a readiness score, severity-ranked findings, and release recommendation.
+Scan the target MLflow project for deployment-blocking environment risks. Inspect requirements.txt, conda.yaml, pyproject.toml, Dockerfile, MLmodel, Python model imports, config files, .env files, KServe manifests, model URIs, and artifact paths. Return a readiness score, severity-ranked findings, and release recommendation.
 ```
 
 Also check for hardcoded IDs, passwords, tokens, API keys, and credential-like values. Never print the actual credential value in the report.
+
+When the user asks to check the current Python environment package list, run:
+
+```bash
+python -m paymlflow_doctor.cli python-env --format markdown --limit 30
+python -m paymlflow_doctor.cli validate <project-path> --check-python-env
+```
 
 ### Fix Environment
 
@@ -73,7 +80,7 @@ Plan safe configuration fixes first. Apply only low-risk non-secret file creatio
 Prompt:
 
 ```text
-Generate a minimal serving requirements.txt proposal from MLmodel, pyproject.toml, conda.yaml, and import hints. Mark the result as a proposal unless dependency versions are already pinned in the source files.
+Generate a minimal serving requirements.txt proposal from MLmodel, pyproject.toml, conda.yaml, Python import hints, and the current Python package list when requested. Mark the result as a proposal unless dependency versions are already pinned in the source files.
 ```
 
 ### Check Artifact
