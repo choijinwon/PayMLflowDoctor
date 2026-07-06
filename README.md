@@ -4,6 +4,8 @@ MLflow Environment Validator & Deployment Copilot for financial AI deployment.
 
 PayMLflow Doctor is a Codex Plugin and Python rule engine that catches MLflow, Docker, KServe, Python, URI, and artifact configuration risks before a model is released. It is built for the KakaoPay AX Hackathon as a practical MLOps safety copilot for FDS, recommendation, OCR, anomaly detection, and other financial AI services.
 
+The default analysis output is a Markdown table report designed for demos, pull request reviews, and release approval.
+
 ## Quick Demo
 
 ```bash

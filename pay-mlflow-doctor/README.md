@@ -4,6 +4,8 @@ MLflow Environment Validator & Deployment Copilot
 
 PayMLflow Doctor는 금융 AI 모델이 배포 직전에 실패하는 환경설정 문제를 Codex Plugin과 Python rule engine으로 사전에 탐지하는 도구입니다. 목표는 단순 환경 검사기가 아니라, 카카오페이의 FDS, 추천, OCR, 이상거래 탐지, 금융 AI 모델 배포를 더 안전하게 만드는 AI Copilot입니다.
 
+기본 분석 보고서는 발표, PR 리뷰, 배포 승인에 바로 붙일 수 있는 Markdown table report 형태로 생성됩니다.
+
 ## 1. 해커톤 우승 가능성 평가
 
 | 항목 | 점수 | 평가 |

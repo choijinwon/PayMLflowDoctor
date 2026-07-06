@@ -112,14 +112,11 @@ Inspect Dockerfile and KServe or Kubernetes serving manifests. Flag missing stor
 Always prefer this response shape:
 
 ```text
-Deployment readiness: <score>/100, <risk_level>
-
-Top blockers:
-1. <finding> in <file>
-2. <finding> in <file>
-
-Recommended next action:
-<specific action>
+Markdown table report:
+- Deployment Summary table
+- Severity Summary table
+- Findings table
+- Fix Plan table
 ```
 
 ## Auto-Fix Policy
