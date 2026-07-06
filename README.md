@@ -22,6 +22,12 @@ cd pay-mlflow-doctor
 ./scripts/demo.sh
 ```
 
+In VSCode, run `Tasks: Run Task` and choose:
+
+- `PayMLflow Doctor: Run Demo`
+- `PayMLflow Doctor: Validate Broken Project`
+- `PayMLflow Doctor: Show Python Environment`
+
 Check the current Python environment package list:
 
 ```bash

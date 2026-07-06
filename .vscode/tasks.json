@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PayMLflow Doctor: Validate Broken Project",
+      "type": "shell",
+      "command": "python -m paymlflow_doctor.cli validate sample-data/broken-mlflow-project --policy policies/kakaopay-mlops-policy.yaml --format markdown",
+      "options": {
+        "cwd": "${workspaceFolder}/pay-mlflow-doctor"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "PayMLflow Doctor: Validate Healthy Project",
+      "type": "shell",
+      "command": "python -m paymlflow_doctor.cli validate sample-data/healthy-mlflow-project --policy policies/kakaopay-mlops-policy.yaml --fail-on high",
+      "options": {
+        "cwd": "${workspaceFolder}/pay-mlflow-doctor"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "PayMLflow Doctor: Show Python Environment",
+      "type": "shell",
+      "command": "python -m paymlflow_doctor.cli python-env --format markdown --limit 30",
+      "options": {
+        "cwd": "${workspaceFolder}/pay-mlflow-doctor"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PayMLflow Doctor: Run Demo",
+      "type": "shell",
+      "command": "./scripts/demo.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/pay-mlflow-doctor"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    }
+  ]
+}

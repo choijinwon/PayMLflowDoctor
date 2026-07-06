@@ -299,6 +299,12 @@ paymlflow-doctor fix sample-data/broken-mlflow-project --policy policies/kakaopa
 ./scripts/demo.sh
 ```
 
+VSCode에서 실행:
+
+```text
+Command Palette → Tasks: Run Task → PayMLflow Doctor: Run Demo
+```
+
 안전 수정 적용:
 
 ```bash
