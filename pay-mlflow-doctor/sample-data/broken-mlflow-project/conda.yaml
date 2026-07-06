@@ -1,0 +1,7 @@
+name: broken-pay-model
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - mlflow==2.12.1
+      - pandas==2.2.2

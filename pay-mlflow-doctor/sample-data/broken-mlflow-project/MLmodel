@@ -1,0 +1,10 @@
+artifact_path: model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+    loader_module: mlflow.sklearn
+    python_version: 3.9
+    data: missing-model.pkl
+model_uuid: demo-broken-model
+run_id: 1234567890abcdef

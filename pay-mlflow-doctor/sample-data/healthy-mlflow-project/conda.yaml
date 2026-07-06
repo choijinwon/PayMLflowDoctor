@@ -1,0 +1,8 @@
+name: healthy-pay-model
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - mlflow==2.12.1
+      - pandas==2.2.2
+      - scikit-learn==1.4.2

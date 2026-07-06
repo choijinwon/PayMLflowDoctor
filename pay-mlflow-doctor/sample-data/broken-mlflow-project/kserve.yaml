@@ -1,0 +1,10 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: fds-risk-model
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: mlflow
+      storageUri: file:/models/fds-risk-model

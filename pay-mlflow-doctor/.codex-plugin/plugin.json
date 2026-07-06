@@ -1,0 +1,39 @@
+{
+  "name": "pay-mlflow-doctor",
+  "version": "0.1.0",
+  "description": "MLflow environment validator and deployment copilot for financial AI services.",
+  "author": {
+    "name": "KakaoPay AX Hackathon Team",
+    "url": "https://github.com/choijinwon/PayMLflowDoctor"
+  },
+  "homepage": "https://github.com/choijinwon/PayMLflowDoctor",
+  "repository": "https://github.com/choijinwon/PayMLflowDoctor.git",
+  "license": "MIT",
+  "keywords": [
+    "mlflow",
+    "kserve",
+    "mlops",
+    "codex",
+    "kakaopay",
+    "deployment"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "PayMLflow Doctor",
+    "shortDescription": "Validate MLflow deployment environments before release.",
+    "longDescription": "PayMLflow Doctor scans MLflow, Docker, KServe, Python, and environment files to catch deployment-blocking configuration risks before financial AI models are released.",
+    "developerName": "KakaoPay AX Hackathon Team",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/choijinwon/PayMLflowDoctor",
+    "defaultPrompt": [
+      "Validate this MLflow project.",
+      "Check model URI and artifacts.",
+      "Suggest safe deployment fixes."
+    ],
+    "brandColor": "#FFCD00"
+  }
+}

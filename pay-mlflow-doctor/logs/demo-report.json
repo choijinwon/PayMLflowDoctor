@@ -1,0 +1,94 @@
+{
+  "project": "/Users/choijinwon/Documents/Codex/2026-07-07-role-openai-codex-plugin-architect-mlops/pay-mlflow-doctor/sample-data/broken-mlflow-project",
+  "score": 0,
+  "risk_level": "blocked",
+  "files_scanned": [
+    "Dockerfile",
+    "MLmodel",
+    "conda.yaml",
+    "config.yaml",
+    "kserve.yaml",
+    "requirements.txt"
+  ],
+  "summary": {
+    "critical": 2,
+    "high": 3,
+    "medium": 2,
+    "low": 1,
+    "info": 0
+  },
+  "findings": [
+    {
+      "id": "PYTHON_VERSION_MISMATCH",
+      "title": "Python versions do not match",
+      "severity": "high",
+      "file": "conda.yaml, Dockerfile, MLmodel",
+      "message": "Detected inconsistent Python versions: {'conda.yaml': '3.9', 'Dockerfile': '3.11', 'MLmodel': '3.9'}.",
+      "recommendation": "Choose one serving Python version and align conda.yaml, Dockerfile, MLmodel, and pyproject.toml.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "UNPINNED_DEPENDENCIES",
+      "title": "Unpinned dependencies reduce reproducibility",
+      "severity": "medium",
+      "file": "requirements.txt",
+      "message": "Unpinned packages detected: mlflow, pandas, numpy.",
+      "recommendation": "Pin production serving dependencies to exact versions for reproducible financial AI deployment.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "TRACKING_URI_MISSING",
+      "title": "MLFLOW_TRACKING_URI is not declared",
+      "severity": "high",
+      "file": ".env.example",
+      "message": "The MLflow tracking endpoint is not visible in env/config files.",
+      "recommendation": "Add MLFLOW_TRACKING_URI to .env.example and deployment secret documentation.",
+      "autofix": "create_env_example"
+    },
+    {
+      "id": "LOCAL_MODEL_URI",
+      "title": "Model URI points to a local file path",
+      "severity": "high",
+      "file": "config.yaml",
+      "message": "Local file model_uri values usually fail after containerization or KServe deployment.",
+      "recommendation": "Use models:/, runs:/, s3://, gs://, or a platform artifact URI reachable from the serving cluster.",
+      "autofix": "requires_confirmation"
+    },
+    {
+      "id": "WINDOWS_PATH_IN_CONFIG",
+      "title": "Windows path separator detected",
+      "severity": "medium",
+      "file": "config.yaml",
+      "message": "Backslash paths can break in Linux containers and Kubernetes pods.",
+      "recommendation": "Use POSIX-style paths or URI schemes for cross-platform deployment.",
+      "autofix": "normalize_paths"
+    },
+    {
+      "id": "ARTIFACT_PATH_MISSING",
+      "title": "Referenced artifact path does not exist",
+      "severity": "critical",
+      "file": "MLmodel",
+      "message": "MLmodel references 'missing-model.pkl', but the path was not found.",
+      "recommendation": "Verify artifact packaging before deployment and ensure the model directory contains referenced files.",
+      "autofix": "none"
+    },
+    {
+      "id": "DOCKER_WORKDIR_MISSING",
+      "title": "Dockerfile has no WORKDIR",
+      "severity": "low",
+      "file": "Dockerfile",
+      "message": "A missing WORKDIR often causes relative artifact and app paths to resolve differently.",
+      "recommendation": "Add WORKDIR /app and copy model/application files relative to it.",
+      "autofix": "insert_workdir"
+    },
+    {
+      "id": "KSERVE_LOCAL_STORAGE_URI",
+      "title": "KServe storageUri uses a local path",
+      "severity": "critical",
+      "file": "kserve.yaml",
+      "message": "Local paths are not portable across Kubernetes nodes.",
+      "recommendation": "Use object storage or PVC-backed paths approved for the serving cluster.",
+      "autofix": "requires_confirmation"
+    }
+  ]
+}
